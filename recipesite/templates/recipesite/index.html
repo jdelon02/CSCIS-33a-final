@@ -1,0 +1,41 @@
+{% extends "recipesite/layout.html" %}
+
+{% block body %}
+   {% for post in recipe_listview %}
+        <div class="card" style="width: 18rem;" id="card-{{ post.id }}">
+            <div class="card-body">
+                {% comment %} <h5 class="card-title">Card title</h5> {% endcomment %}
+                <h6 class="card-subtitle mb-2 text-muted"><a id="user-{{ post.id }}" href="{% url 'user_detail' pk=post.user_id.pk %}">@{{ post.user_id }}</a> wrote:</h6>
+                <p id="body-{{post.id }}" class="card-text">{{ post.body }}</p>
+                <button id="{{ post.id }}" value="Likes: {{ post.total_likes }}" data-id="{{ post.id }}" data-postuser="{{ post.user_id }}" data-currentuser="{{ user.username }}" class="btn btn-primary card-link" onClick=likebutton(this);>{{ post.total_likes }}</button>
+                <a href="#" class="card-link">{{ post.timestamp }}</a>
+                {% if user.username|stringformat:"s" == post.user_id|stringformat:"s" %}
+                    <button id="edit-{{ post.id }}" data-id="{{ post.id }}" data-currentuser="{{ user.username }}" class="btn btn-primary card-link-edit" onClick=editMe(this);>Edit</button>
+                    <form method="POST" id="form-{{ post.id }}" class="form-card" onsubmit="return update_post({{ post.id }})"></form>
+                {% endif %}
+            </div>
+        </div>
+    {% empty %}
+        <p>There are no Post to view at this time.</p>
+    {% endfor %}
+
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+
+{% endblock %}
+
