@@ -56,7 +56,7 @@ class Recipes(Model):
         null=True
     )
     ingredient = ManyToManyField(
-        'Ingredients'
+        'IngredientLists'
         # through='IngredientLists'
     )
     

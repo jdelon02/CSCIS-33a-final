@@ -20,7 +20,7 @@ class RecipesForm(ModelForm):
             'cookTimeMin'
         ]
 
-
+# IngredientFormSet = inlineformset_factory(IngredientLists, Recipes, form=RecipesForm)
 IngredientFormSet = modelformset_factory(
     IngredientLists, 
     fields=(
