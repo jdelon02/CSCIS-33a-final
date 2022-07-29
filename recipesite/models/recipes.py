@@ -1,7 +1,9 @@
 """Data models."""
 from django.db import models
+from django.urls import reverse
 from .user import User
-from .ingredientlists import IngredientLists
+# from .ingredientlists import IngredientLists
+# from .ingredients import Ingredients
 from django.db.models import (
     Model,
     CASCADE,
@@ -46,20 +48,25 @@ class Recipes(Model):
         blank=True,
         null=True
     )
-    userId = ForeignKey(
-        User, 
+    author = ForeignKey(
+        'User', 
         on_delete=CASCADE,
-        related_name='likes'
+        related_name='authors',
+        blank=True,
+        null=True
     )
-    ingredients_list = ManyToManyField(
-        IngredientLists, 
-        blank=True
+    ingredient = ManyToManyField(
+        'Ingredients'
+        # through='IngredientLists'
     )
     
 
     def __str__(self):
         return self.name
-        
+    
+    
+    def get_absolute_url(self):
+        return reverse('recipe-detail', kwargs={'pk': self.pk})    
     # def from_form(self, form):
     #     self.id = form.id.data
     #     self.name = form.name.data
@@ -72,3 +79,4 @@ class Recipes(Model):
     #     self.cookTimeHour = form.cookTimeHour.data
     #     self.cookTimeMin = form.cookTimeMin.data
     #     self.userId = form.userId.data
+    

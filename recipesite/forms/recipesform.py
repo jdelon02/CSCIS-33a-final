@@ -1,5 +1,5 @@
 """This is a docstring which describes the module"""
-from django.forms import ModelForm, inlineformset_factory
+from django.forms import ModelForm, inlineformset_factory, modelformset_factory
 from recipesite.models import Recipes, IngredientLists
 
 
@@ -18,7 +18,16 @@ class RecipesForm(ModelForm):
             'prepTimeMin',
             'cookTimeHour',
             'cookTimeMin'
-            # 'ingredients_list'
         ]
-        exclude = ('ingredients_list')
-IngredientFormSet = inlineformset_factory(IngredientLists, Recipes, form=RecipesForm)
+
+
+IngredientFormSet = modelformset_factory(
+    IngredientLists, 
+    fields=(
+        'name',
+        'unitId',
+        'quantity',
+        'description'
+    ),
+    extra=1,
+)

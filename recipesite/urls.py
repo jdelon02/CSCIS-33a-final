@@ -1,11 +1,14 @@
 
 from django.urls import path
 from .views import recipe_view, user_view
+from .views.recipe_view import RecipeCreateView, RecipeUpdateView
 
 
 urlpatterns = [
     path("", recipe_view.Index.as_view(), name="index"),
-    path("add", recipe_view.single_recipe, name="addpost"),
+    path('recipe/add/', RecipeCreateView.as_view(), name='recipe-add'),
+    path('recipe/<int:pk>/', RecipeUpdateView.as_view(), name='recipe-update'),
+    # path('author/<int:pk>/delete/', recipe_view.RecipeDeleteView.as_view(), name='recipe-delete'),
     path("login", user_view.login_view, name="login"),
     path("logout", user_view.logout_view, name="logout"),
     path("register", user_view.register, name="register"),

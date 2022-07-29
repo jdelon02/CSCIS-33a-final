@@ -1,0 +1,19 @@
+{% extends "recipesite/layout.html" %}
+
+
+{% block body %}
+{% load crispy_forms_tags %}
+<form action="{% url 'recipe-add' %}" method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <br>
+    <br>
+    <h2>Add Ingredients</h2>
+    {{ formset.management_form }}
+    {% for form in formset %}
+    {% crispy formset %}
+    {% endfor %}
+    <button id="add-ingredient" type="button">Add Another Bird</button>
+    <button type="submit">Submit</button>
+</form>
+{% endblock %}

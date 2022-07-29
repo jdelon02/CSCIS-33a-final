@@ -1,7 +1,8 @@
 """Data models."""
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from .ingredients import Ingredients
+# from .ingredients import Ingredients
+# from .recipes import Recipes
 from django.db.models import (
     Model,
     CASCADE,
@@ -13,10 +14,16 @@ from django.db.models import (
  
 class IngredientLists(Model):
     """Data model for user accounts."""
-    ingredient = ForeignKey(
-        Ingredients, 
+    recipe = ForeignKey(
+        'Recipes',
         on_delete=CASCADE,
-        related_name='ingr_name'
+        blank=True,
+        null=True
+        
+    )
+    name = TextField(
+        blank=True,
+        null=True
     )
     unitId = IntegerField(
         blank=True,
