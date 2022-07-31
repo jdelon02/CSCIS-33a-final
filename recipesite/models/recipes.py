@@ -1,82 +1,86 @@
 """Data models."""
 from django.db import models
 from django.urls import reverse
-from .user import User
 # from .ingredientlists import IngredientLists
 # from .ingredients import Ingredients
 from django.db.models import (
     Model,
     CASCADE,
     ForeignKey,
-    IntegerField,
     TextField,
-    ManyToManyField
-) 
+    ManyToManyField,
+    CharField
+)
+from . import User, ServingSize, PrepCookMin, PrepCookHour, Difficulty, Ingredients
 
 # TODO: Description Field to model, recipe.
 class Recipes(Model):
+    
     """Data model for user accounts."""
-    name = TextField(
+    name = CharField(
+        max_length = 80
+    )
+    description = CharField(
+        max_length = 240
+    )
+    servingQuantity = ForeignKey(
+        ServingSize, 
+        on_delete=CASCADE,
+        related_name='servingQuantity_ServingSize',
         blank=True,
         null=True
     )
-    description = TextField(
+    skillLevel = ForeignKey(
+        Difficulty, 
+        on_delete=CASCADE,
+        related_name='skillLevel_Difficulty',
         blank=True,
         null=True
     )
-    servingQuantity = IntegerField(
+    prepmin = ForeignKey(
+        PrepCookMin, 
+        on_delete=CASCADE,
+        related_name='prepmin_PrepCookMin',
         blank=True,
         null=True
     )
-    skillLevel = IntegerField(
+    prephour = ForeignKey(
+        PrepCookHour, 
+        on_delete=CASCADE,
+        related_name='prephour_PrepCookHour',
         blank=True,
         null=True
     )
-    prepTimeHour = IntegerField(
+    cookmin = ForeignKey(
+        PrepCookMin, 
+        on_delete=CASCADE,
+        related_name='cookmin_PrepCookMin',
         blank=True,
         null=True
     )
-    prepTimeMin = IntegerField(
-        blank=True,
-        null=True
-    )
-    cookTimeHour = IntegerField(
-        blank=True,
-        null=True
-    )
-    cookTimeMin = IntegerField(
+    cookhour = ForeignKey(
+        PrepCookHour, 
+        on_delete=CASCADE,
+        related_name='cookhour_PrepCookHour',
         blank=True,
         null=True
     )
     author = ForeignKey(
-        'User', 
+        User, 
         on_delete=CASCADE,
-        related_name='authors',
+        related_name='author_User',
         blank=True,
         null=True
     )
-    ingredient = ManyToManyField(
-        'IngredientLists'
-        # through='IngredientLists'
-    )
-    
+    # ingredient = ForeignKey(
+    #     Ingredients,
+    #     on_delete=CASCADE,
+    #     blank=True, 
+    #     related_name='ingredient_Ingredients'
+    # )
 
     def __str__(self):
         return self.name
     
-    
     def get_absolute_url(self):
-        return reverse('recipe-detail', kwargs={'pk': self.pk})    
-    # def from_form(self, form):
-    #     self.id = form.id.data
-    #     self.name = form.name.data
-    #     self.description = form.description.data
-    #     self.filename = form.filename.data
-    #     self.servingQuantity = form.servingQuantity.data
-    #     self.skillLevel = form.skillLevel.data
-    #     self.prepTimeHour = form.prepTimeHour.data
-    #     self.prepTimeMin = form.prepTimeMin.data
-    #     self.cookTimeHour = form.cookTimeHour.data
-    #     self.cookTimeMin = form.cookTimeMin.data
-    #     self.userId = form.userId.data
-    
+        return reverse('recipe-detail', kwargs={'pk': self.pk})        

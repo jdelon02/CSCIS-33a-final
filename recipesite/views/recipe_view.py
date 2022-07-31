@@ -6,6 +6,7 @@ from django.core.serializers import serialize
 from django.core.paginator import Paginator
 from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib import messages
+from django.forms import modelformset_factory
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required
@@ -17,7 +18,7 @@ from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from recipesite.models import *
 from recipesite.forms import ingredientsform, recipesform
-from recipesite.forms.recipesform import IngredientFormSet, RecipesForm
+from recipesite.forms.recipesform import RecipesForm, IngredientFormSet
 
 
 paginationnum = 10
@@ -56,38 +57,67 @@ class BookmarkListView(UserPassesTestMixin, ListView):
         return queryset
 
 
-class RecipeCreateView(LoginRequiredMixin, CreateView):
+# class RecipeCreateView(LoginRequiredMixin, CreateView):
+class RecipeCreateView(CreateView):
     model = Recipes
-    # form_class = recipesform
-    fields = [
-        'name',
-        'description',
-        'servingQuantity',
-        'skillLevel',
-        'prepTimeHour',
-        'prepTimeMin',
-        'cookTimeHour',
-        'cookTimeMin'
-    ]
+    form_class = RecipesForm
+    template_name = 'recipesite/recipes_form.html'
     
-    def form_valid(self, form):
-        form.instance.created_by = self.request.user
-        return super().form_valid(form)
+    def get(self, request, *args, **kwargs):
+        self.object = None
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        formset = IngredientFormSet()
+        return self.render_to_response(
+                self.get_context_data(form=form,
+                        formset=formset,
+                                )
+                        )
 
-    def get_context_data(self, *args, **kwargs):
-        context = super(RecipeCreateView,
-                        self).get_context_data(*args, **kwargs)
-        current_user = self.request.user.id
-        context['currentUser'] = current_user 
-        context['formset'] = IngredientFormSet(queryset=Ingredients.objects.none()) 
-        context['ingrient_form'] = ingredientsform
+    def post(self, request, *args, **kwargs):
+        self.object = None
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        # formset = IngredientFormSet(self.request.POST)
+        formset = IngredientFormSet(self.request.POST, instance=form.instance)
+        if form.is_valid() and formset.is_valid():
+            return self.form_valid(form, formset)
+        else:
+            return self.form_invalid(form, formset)
+
+    def form_valid(self, form, formset):
+        print(form.instance)
+        recipe = form.save(commit=False)
         
-        return context
-    
-    # def get_queryset(self):
-    #     current_user = self.request.user.id
-    #     queryset = Recipes.objects.filter(user_id__in=current_user).distinct().order_by('-id')
-    #     return queryset
+        recipe.author = self.request.user
+        recipe.servingQuantity = ServingSize.objects.create(serving=form.data['servingQuantity'])
+        recipe.skillLevel = Difficulty.objects.create(level=form.data['skillLevel'])
+        recipe.prepmin = PrepCookMin.objects.create(timeMin=form.data['prepmin'])
+        recipe.prephour = PrepCookHour.objects.create(timeHour=form.data['prephour'])
+        recipe.cookmin = PrepCookMin.objects.create(timeMin=form.data['cookmin'])
+        recipe.cookhour = PrepCookHour.objects.create(timeHour=form.data['cookhour'])
+        
+        recipe.save()
+        ingredientlist = formset.save(commit=False)
+        for ingr in ingredientlist:
+            ingr.instance = self.object
+            ingr.save()
+        return HttpResponseRedirect(
+                reverse_lazy('recipe-add'))
+        
+    # def form_valid(self, form, education_formset):
+    #     # with transaction.atomic():
+    #     form.instance.employee.user = self.request.user
+    #     self.object = form.save()
+    #     # Now we process the education formset
+    #     educations = education_formset.save(commit=False)
+    #     for education in educations:
+    #         education.instance = self.object
+    #         education.save()
+    #         # If you had more formsets, you would accept additional arguments and
+    #         # process them as with the one above.
+    #     # Don't call the super() method here - you will end up saving the form twice. Instead handle the redirect yourself.
+    #     return HttpResponseRedirect(self.get_success_url())
 
 class RecipeUpdateView(UpdateView):
     model = Recipes

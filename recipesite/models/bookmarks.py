@@ -1,12 +1,11 @@
 """This is a docstring which describes the module"""
 from django.db import models
-from .user import User
-from .recipes import Recipes
 from django.db.models import (
     Model,
     CASCADE,
     ForeignKey
 )
+from . import User, Recipes
 
 class Bookmarks(Model):
     user = ForeignKey(

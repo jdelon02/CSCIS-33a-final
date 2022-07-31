@@ -4,10 +4,13 @@ from django.forms import ModelForm
 from recipesite.models import User
 
 
-class RecipePostForm(ModelForm):
+class UserPostForm(ModelForm):
     """This is a docstring which describes the module"""
     
     class Meta:
         """This is a docstring which describes the module"""
         model = User
         fields = ['body']
+
+    def __str__(self):
+        return self.id

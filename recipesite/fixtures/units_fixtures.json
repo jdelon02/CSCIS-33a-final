@@ -1,0 +1,80 @@
+[
+    {
+      "model": "recipesite.units",
+      "pk": 1,
+      "fields": {
+        "unit": "Unit"
+      }
+    },
+    {
+        "model": "recipesite.units",
+        "pk": 2,
+        "fields": {
+          "unit": "Cup"
+        }
+      },
+      {
+        "model": "recipesite.units",
+        "pk": 3,
+        "fields": {
+          "unit": "Tablespoon"
+        }
+      },
+      {
+        "model": "recipesite.units",
+        "pk": 4,
+        "fields": {
+          "unit": "Teaspoon"
+        }
+      },
+      {
+        "model": "recipesite.units",
+        "pk": 5,
+        "fields": {
+          "unit": "Pint"
+        }
+      },
+      {
+        "model": "recipesite.units",
+        "pk": 6,
+        "fields": {
+          "unit": "Quart"
+        }
+      },
+      {
+        "model": "recipesite.units",
+        "pk": 7,
+        "fields": {
+          "unit": "Ounce"
+        }
+      },
+      {
+        "model": "recipesite.units",
+        "pk": 8,
+        "fields": {
+          "unit": "Dozen"
+        }
+      },
+      {
+        "model": "recipesite.units",
+        "pk": 9,
+        "fields": {
+          "unit": "Can"
+        }
+      },
+      {
+        "model": "recipesite.units",
+        "pk": 10,
+        "fields": {
+          "unit": "Bunch"
+        }
+      },
+      {
+        "model": "recipesite.units",
+        "pk": 11,
+        "fields": {
+          "unit": "Whole"
+        }
+      }
+      
+  ]
