@@ -1,6 +1,8 @@
 """Data models."""
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.utils.translation import gettext_lazy as _
+from model_utils import Choices
 from django.db.models import (
     Model,
     CASCADE,
@@ -9,10 +11,29 @@ from django.db.models import (
     TextField,
     CharField
 )
-from . import Units, QuantityWhole, QuantityFraction
+from . import Units
  
 class Ingredients(Model):
-    
+    UNITSTATUS = Choices(
+            ('cup', ('Cup')),
+            ('tablespoon', ('Tablespoon')),
+            ('teaspoon', ('Teaspoon')),
+            ('pint', ('Pint')),
+            ('quart', ('Quart')),
+            ('ounce', ('Ounce')),
+            ('dozen', ('Dozen')),
+            ('can', ('Can')),
+            ('bunch', ('Bunch')),
+            ('whole', ('Whole')),
+        )
+    QUANTS = Choices(
+        ('quantity', _('Quantity')),
+        ('1/4', _('1/4')),
+        ('1/3', _('1/3')),
+        ('1/2', _('1/2')),
+        ('2/3', _('2/3')),
+        ('3/4', _('3/4')),
+    )
     """Data model for user accounts."""
     recipe = ForeignKey(
         'Recipes',
@@ -26,29 +47,19 @@ class Ingredients(Model):
         null=True,
         max_length=75
     )
-    unitId = ForeignKey(
-        Units,
-        on_delete=CASCADE,
-        related_name='unitId_Units',
-        blank=True,
-        null=True
+    unitId = CharField(
+        max_length = 10,
+        choices=UNITSTATUS        
     )
-    quantitywhole = ForeignKey(
-        QuantityWhole,
-        on_delete=CASCADE,
-        related_name='quantitywhole_QuantityWhole',
-        blank=True,
-        null=True
+    quantitywhole = CharField(
+        max_length=2
     )
-    quantityfraction = ForeignKey(
-        QuantityFraction,
-        on_delete=CASCADE,
-        related_name='quantityfraction_QuantityFraction',
-        blank=True,
-        null=True
+    quantityfraction = CharField(
+        max_length = 8,
+        choices=QUANTS        
     )
     description = CharField(
-        max_length=210,
+        max_length=100,
         blank=True,
         null=True
     )
@@ -58,4 +69,4 @@ class Ingredients(Model):
     )
 
     def __str__(self):
-        return self.id
+        return self.name

@@ -1,0 +1,40 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+   {% for post in twitter_detail %}
+        <div class="card" style="width: 18rem;" id="card-{{ post.id }}">
+            <div class="card-body">
+                <h5 class="card-title">{{ recipe.name }}</h5>
+                {% comment %} <h6 class="card-subtitle mb-2 text-muted"><a id="user-{{ post.id }}" href="{% url 'user_detail' pk=post.user_id.pk %}">@{{ post.user_id }}</a> wrote:</h6> {% endcomment %}
+                <p id="body-{{recipe.id }}" class="card-text">{{ recipe.description }}</p>
+                <button id="{{ recipe.id }}" value="Likes: {{ recipe.total_likes }}" data-id="{{ recipe.id }}" data-postuser="{{ recipe.author.id }}" data-currentuser="{{ recipe.author.username }}" class="btn btn-primary card-link" onClick=likebutton(this);>{{ recipe.total_likes }}</button>
+                <a href="#" class="card-link">{{ recipe.timestamp }}</a>
+                {% if user.username|stringformat:"s" == recipe.author.username|stringformat:"s" %}
+                    <button id="edit-{{ recipe.id }}" data-id="{{ recipe.id }}" data-currentuser="{{ user.username }}" class="btn btn-primary card-link-edit" onClick=editMe(this);>Edit</button>
+                    <form method="POST" id="form-{{ recipe.id }}" class="form-card" onsubmit="return update_post({{ recipe.id }})"></form>
+                {% endif %}
+            </div>
+        </div>
+    {% empty %}
+        <p>There are no Post to view at this time.</p>
+    {% endfor %}
+
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; first</a>
+                <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+            {% endif %}
+    
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </span>
+    
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+{% endblock %}
+

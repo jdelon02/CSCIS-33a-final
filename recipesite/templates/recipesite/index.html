@@ -1,24 +1,36 @@
 {% extends "recipesite/layout.html" %}
 
 {% block body %}
-   {% for post in recipe_listview %}
-        <div class="card" style="width: 18rem;" id="card-{{ post.id }}">
+{% load crispy_forms_tags %}
+<div class="container">
+    <div class="row" data-masonry='{"percentPosition": true }'>
+   {% for recipe in recipe_listview %}
+        {% comment %} <div>
+            <div>recipe.author.username: {{ recipe.author.username }}</div>
+            <div>user.username: {{ user.username }}</div>
+            <div>recipe.author.id: {{ recipe.author.id }}</div>
+        </div> {% endcomment %}
+
+        <div class="col-sm-4 col-md-6 col-lg-4">
+        <div class="card" style="width: 18rem;" id="card-{{ recipe.id }}">
             <div class="card-body">
-                {% comment %} <h5 class="card-title">Card title</h5> {% endcomment %}
-                <h6 class="card-subtitle mb-2 text-muted"><a id="user-{{ post.id }}" href="{% url 'user_detail' pk=post.user_id.pk %}">@{{ post.user_id }}</a> wrote:</h6>
-                <p id="body-{{post.id }}" class="card-text">{{ post.body }}</p>
-                <button id="{{ post.id }}" value="Likes: {{ post.total_likes }}" data-id="{{ post.id }}" data-postuser="{{ post.user_id }}" data-currentuser="{{ user.username }}" class="btn btn-primary card-link" onClick=likebutton(this);>{{ post.total_likes }}</button>
-                <a href="#" class="card-link">{{ post.timestamp }}</a>
-                {% if user.username|stringformat:"s" == post.user_id|stringformat:"s" %}
-                    <button id="edit-{{ post.id }}" data-id="{{ post.id }}" data-currentuser="{{ user.username }}" class="btn btn-primary card-link-edit" onClick=editMe(this);>Edit</button>
-                    <form method="POST" id="form-{{ post.id }}" class="form-card" onsubmit="return update_post({{ post.id }})"></form>
+                <h5 class="card-title">{{ recipe.name }}</h5>
+                {% comment %} <h6 class="card-subtitle mb-2 text-muted"><a id="user-{{ post.id }}" href="{% url 'user_detail' pk=post.user_id.pk %}">@{{ post.user_id }}</a> wrote:</h6> {% endcomment %}
+                <p id="body-{{recipe.id }}" class="card-text">{{ recipe.description }}</p>
+                <button id="{{ recipe.id }}" value="Likes: {{ recipe.total_likes }}" data-id="{{ recipe.id }}" data-postuser="{{ recipe.author.id }}" data-currentuser="{{ recipe.author.username }}" class="btn btn-primary card-link" onClick=likebutton(this);>{{ recipe.total_likes }}</button>
+                <a href="#" class="card-link">{{ recipe.timestamp }}</a>
+                {% if user.username|stringformat:"s" == recipe.author.username|stringformat:"s" %}
+                    <button id="edit-{{ recipe.id }}" data-id="{{ recipe.id }}" data-currentuser="{{ user.username }}" class="btn btn-primary card-link-edit" onClick=editMe(this);>Edit</button>
+                    <form method="POST" id="form-{{ recipe.id }}" class="form-card" onsubmit="return update_post({{ recipe.id }})"></form>
                 {% endif %}
             </div>
         </div>
+    </div>
     {% empty %}
         <p>There are no Post to view at this time.</p>
     {% endfor %}
-
+    </div>
+</div>
 <div class="pagination">
     <span class="step-links">
         {% if page_obj.has_previous %}

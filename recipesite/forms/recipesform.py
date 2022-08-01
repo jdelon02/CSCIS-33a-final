@@ -2,23 +2,47 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from model_utils import Choices
-from django.forms import ModelForm, inlineformset_factory
+from django.forms import ModelForm, inlineformset_factory, ChoiceField, Select
+from recipesite.forms.ingredientsform import IngredientsForm
 from recipesite.models import Recipes, Ingredients
+from easy_select2 import select2_modelform, Select2
 
 
 class RecipesForm(ModelForm):
     """This is a docstring which describes the module"""
-    
+    QUANTS = Choices(
+        ('1/4', _('1/4')),
+        ('1/3', _('1/3')),
+        ('1/2', _('1/2')),
+        ('2/3', _('2/3')),
+        ('3/4', _('3/4')),
+    )
     class Meta:
         """This is a docstring which describes the module"""
         model = Recipes
         fields = [
             'name',
-            'description'
+            'description',
+            'likes'
         ]
     
     def __str__(self):
         return self.name
+    
+    @property
+    def total_likes(self):
+        return self.likes.count() 
+    
+    def serialize(self):
+        return {
+            "id": self.id,
+            # Originally, I had user included, but serialization breaks with foreign keys.
+            # "user_id": self.user_id,
+            "name": self.name,
+            "description": self.description,
+            "timestamp": self.timestamp.strftime("%b %d %Y, %I:%M %p"),
+            "likes": self.likes.count()
+        }
         
     def __init__(self, *args, **kwargs):
         super(RecipesForm, self).__init__(*args, **kwargs)
@@ -59,23 +83,43 @@ class RecipesForm(ModelForm):
             ('30', _('30')),
             ('45', _('45')),
         )
-        self.fields['skillLevel'] = forms.ChoiceField(choices=DIFFS)
-        self.fields['servingQuantity'] = forms.ChoiceField(choices=SERVING)
-        self.fields['prephour'] = forms.ChoiceField(choices=HOURSTATUS)
-        self.fields['prepmin'] = forms.ChoiceField(choices=MINSTATUS)
-        self.fields['cookhour'] = forms.ChoiceField(choices=HOURSTATUS)
-        self.fields['cookmin'] = forms.ChoiceField(choices=MINSTATUS)
+        self.fields['skillLevel'] = forms.ChoiceField(
+                                widget=Select2(),
+                                choices=DIFFS, 
+                                label="Skill Level"
+                        )
+        self.fields['servingQuantity'] = forms.ChoiceField(
+                                choices=SERVING, 
+                                label="Servings / Quantity"
+                        )
+        self.fields['prephour'] = forms.ChoiceField(
+                                choices=HOURSTATUS, 
+                                label="Hours"
+                        )
+        self.fields['prepmin'] = forms.ChoiceField(
+                                choices=MINSTATUS, 
+                                label="Minutes"
+                        )
+        self.fields['cookhour'] = forms.ChoiceField(
+                                choices=HOURSTATUS, 
+                                label="Hours"
+                        )
+        self.fields['cookmin'] = forms.ChoiceField(
+                                choices=MINSTATUS, 
+                                label="Minutes"
+                        )
 
 IngredientFormSet = inlineformset_factory(
     Recipes, 
     Ingredients,
-    fields=(
-        'quantitywhole',
-        'quantityfraction',
-        'unitId',
-        'name',
-        'description'
-    ),
+    # fields=(
+    #     'quantitywhole',
+    #     'quantityfraction',
+    #     'unitId',
+    #     'name',
+    #     'description'
+    # ),
+    form=IngredientsForm,
     extra=1,
     can_delete=True
 )

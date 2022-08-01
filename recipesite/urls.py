@@ -3,6 +3,7 @@ from django.urls import path
 from .views import recipe_view, user_view, ingredients_view
 from .views.recipe_view import RecipeCreateView, RecipeUpdateView
 from .views.ingredients_view import IngredientsCreateView
+from .views.user_view import UserDetailView
 
 
 urlpatterns = [
@@ -13,14 +14,14 @@ urlpatterns = [
     path("login", user_view.login_view, name="login"),
     path("logout", user_view.logout_view, name="logout"),
     path("register", user_view.register, name="register"),
-    # path("user/<int:pk>", user_view.UserDetailView.as_view(), name="user_detail"),
+    path("user/<int:pk>", user_view.UserDetailView.as_view(), name="user_detail"),
     path("bookmarks/<int:pk>", recipe_view.BookmarkListView.as_view(), name="bookmarks"),
     path("ingrdients", recipe_view.Index.as_view(), name="ingredients"),
     path('ingredients/add/', IngredientsCreateView.as_view(), name='ingr-add'),
     # API Routes
-    # path("post/<int:post_id>",twitterpost_view.like_button, name='like'),
-    # path("getpost/<int:post_id>",twitterpost_view.getPost, name='getPost'),
-    # path("user/follow/<int:user_id>",user_view.followme, name='followme')
+    path("recipe/<int:recipe_id>",recipe_view.like_button, name='like'),
+    path("getrecipe/<int:recipe_id>",recipe_view.getRecipe, name='getRecipe'),
+    path("user/follow/<int:user_id>",user_view.followme, name='followme')
 
     
 ]

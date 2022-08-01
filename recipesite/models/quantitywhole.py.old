@@ -9,6 +9,7 @@ from django.db.models import (
 class QuantityWhole(Model):
 
     quantWhole = CharField(
+        primary_key = True,
         max_length=2
     )
     

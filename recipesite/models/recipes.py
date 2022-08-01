@@ -9,7 +9,8 @@ from django.db.models import (
     ForeignKey,
     TextField,
     ManyToManyField,
-    CharField
+    CharField,
+    DateTimeField
 )
 from . import User, ServingSize, PrepCookMin, PrepCookHour, Difficulty, Ingredients
 
@@ -37,6 +38,7 @@ class Recipes(Model):
         blank=True,
         null=True
     )
+    # TODO: Combine these into 1 and crate another inline_formset
     prepmin = ForeignKey(
         PrepCookMin, 
         on_delete=CASCADE,
@@ -51,6 +53,7 @@ class Recipes(Model):
         blank=True,
         null=True
     )
+    # TODO: Combine these into 1 and crate another inline_formset
     cookmin = ForeignKey(
         PrepCookMin, 
         on_delete=CASCADE,
@@ -72,13 +75,31 @@ class Recipes(Model):
         blank=True,
         null=True
     )
-    # ingredient = ForeignKey(
-    #     Ingredients,
-    #     on_delete=CASCADE,
-    #     blank=True, 
-    #     related_name='ingredient_Ingredients'
-    # )
+    timestamp = DateTimeField(
+        auto_now_add=True,
+        blank=True
+    )
+    likes = ManyToManyField(
+        User,
+        blank=True,
+        related_name='likes'
+    )
 
+    @property
+    def total_likes(self):
+        return self.likes.count() 
+    
+    def serialize(self):
+        return {
+            "id": self.id,
+            # Originally, I had user included, but serialization breaks with foreign keys.
+            # "user_id": self.user_id,
+            "name": self.name,
+            "description": self.description,
+            "timestamp": self.timestamp.strftime("%b %d %Y, %I:%M %p"),
+            "likes": self.likes.count()
+        }
+        
     def __str__(self):
         return self.name
     

@@ -31,6 +31,18 @@ class Index(ListView):
     template_name = 'recipesite/index.html'
     paginate_by = paginationnum
     
+    def get_context_data(self, *args, **kwargs):
+        context = super(Index,
+                        self).get_context_data(*args, **kwargs)
+        current_user = self.request.user.id
+        context['currentUser'] = current_user
+        
+        return context
+    
+    def get_queryset(self):
+        queryset = Recipes.objects.all().order_by('-id')
+        return queryset
+    
 class BookmarkListView(UserPassesTestMixin, ListView):
     model = Bookmarks
     context_object_name = 'recipes_listview'
@@ -57,11 +69,17 @@ class BookmarkListView(UserPassesTestMixin, ListView):
         return queryset
 
 
-# class RecipeCreateView(LoginRequiredMixin, CreateView):
-class RecipeCreateView(CreateView):
+class RecipeCreateView(LoginRequiredMixin, CreateView):
     model = Recipes
     form_class = RecipesForm
     template_name = 'recipesite/recipes_form.html'
+    
+    def test_func(self):
+        test = self.request.user.id
+        if test:
+            return True
+        else:
+            return False
     
     def get(self, request, *args, **kwargs):
         self.object = None
@@ -78,8 +96,7 @@ class RecipeCreateView(CreateView):
         self.object = None
         form_class = self.get_form_class()
         form = self.get_form(form_class)
-        # formset = IngredientFormSet(self.request.POST)
-        formset = IngredientFormSet(self.request.POST, instance=form.instance)
+        formset = IngredientFormSet(self.request.POST)
         if form.is_valid() and formset.is_valid():
             return self.form_valid(form, formset)
         else:
@@ -88,36 +105,27 @@ class RecipeCreateView(CreateView):
     def form_valid(self, form, formset):
         print(form.instance)
         recipe = form.save(commit=False)
-        
+        print(form.data)
         recipe.author = self.request.user
         recipe.servingQuantity = ServingSize.objects.create(serving=form.data['servingQuantity'])
         recipe.skillLevel = Difficulty.objects.create(level=form.data['skillLevel'])
         recipe.prepmin = PrepCookMin.objects.create(timeMin=form.data['prepmin'])
         recipe.prephour = PrepCookHour.objects.create(timeHour=form.data['prephour'])
         recipe.cookmin = PrepCookMin.objects.create(timeMin=form.data['cookmin'])
-        recipe.cookhour = PrepCookHour.objects.create(timeHour=form.data['cookhour'])
-        
+        recipe.cookhour = PrepCookHour.objects.create(timeHour=form.data['cookhour'])        
         recipe.save()
+        print(recipe.pk)
+
         ingredientlist = formset.save(commit=False)
         for ingr in ingredientlist:
             ingr.instance = self.object
+            ingr.recipe_id = recipe.pk
+            print(ingr.instance)
             ingr.save()
+            print(ingr)
         return HttpResponseRedirect(
                 reverse_lazy('recipe-add'))
         
-    # def form_valid(self, form, education_formset):
-    #     # with transaction.atomic():
-    #     form.instance.employee.user = self.request.user
-    #     self.object = form.save()
-    #     # Now we process the education formset
-    #     educations = education_formset.save(commit=False)
-    #     for education in educations:
-    #         education.instance = self.object
-    #         education.save()
-    #         # If you had more formsets, you would accept additional arguments and
-    #         # process them as with the one above.
-    #     # Don't call the super() method here - you will end up saving the form twice. Instead handle the redirect yourself.
-    #     return HttpResponseRedirect(self.get_success_url())
 
 class RecipeUpdateView(UpdateView):
     model = Recipes
@@ -135,6 +143,26 @@ class RecipeUpdateView(UpdateView):
         current_user = self.request.user.id
         context['currentUser'] = current_user  
         return context
+
+
+
+@csrf_exempt
+@login_required
+def like_button(request, recipe_id):
+    if request.method == "PUT":
+        data = json.loads(request.body)
+        userdata = User.objects.get(username=data['user'])
+        postdata = data['id']
+        postcheck=get_object_or_404(Recipes,pk=postdata)
+        if postcheck.likes.filter(id=userdata.id):
+            postcheck.likes.remove(userdata) #remove user from likes 
+            liked=False
+        else:
+            postcheck.likes.add(userdata)
+            liked=True
+        return JsonResponse({'likes':postcheck.total_likes, "likeclass":liked})
+    else:
+        return HttpResponse('CSRF token is being exempted here!')
 
 # class RecipeDeleteView(DeleteView):
 #     model = Recipes
@@ -170,3 +198,60 @@ class RecipeUpdateView(UpdateView):
 #             #     messages.ERROR,
 #             #     'Post Not Added.')
 #             return render(request, template_name, {'form': form})
+
+@csrf_exempt
+@login_required
+def single_recipe(request):
+    """This is a docstring which describes the module"""
+    if request.method == "GET":
+        template_name = 'recipes/recipesingle_form.html'
+        form = Recipes()
+        # bid_class = self.bid_class
+        return render(request, template_name, {'form': form})
+
+    elif request.method == "POST":
+        form = RecipesForm(request.POST)
+        current_userid = request.user.id
+        current_user = User.objects.get(pk=current_userid)
+        if form.is_valid():
+            new_recipe = Recipes()
+            new_recipe.description = form.data['decription']
+            new_recipe.user_id = current_user
+            new_recipe.save()
+            # form.save()
+            messages.add_message(request, messages.SUCCESS, 
+                                'Post Added.')
+            return HttpResponseRedirect(
+                reverse_lazy('addpost'))
+        else:
+            messages.add_message(
+                request,
+                messages.ERROR,
+                'Post Not Added.')
+            return render(request, template_name, {'form': form})
+
+
+@csrf_exempt
+def getRecipe(request, recipe_id):
+    if request.method == "GET":
+        print(recipe_id)
+        postcheck=Recipes.objects.get(pk=recipe_id)
+        userid = postcheck.user_id.id
+        # print(userid)
+        if postcheck:
+            jsonreply = postcheck.serialize()
+            return JsonResponse({"jsonreply":jsonreply, "id":userid})
+        else:
+            pass
+    elif request.method == "PUT":
+        data = json.loads(request.body)
+        print(data)
+        # postdata = User.objects.get(username=data['user'])
+        # postdata = data['id']
+        postcheck=get_object_or_404(Recipes,pk=recipe_id)
+        if postcheck:
+            postcheck.body = data
+            postcheck.save()
+            return JsonResponse(postcheck.serialize())
+    else:
+        return HttpResponse('CSRF token is being exempted here!')

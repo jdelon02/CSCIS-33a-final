@@ -17,3 +17,8 @@ class User(AbstractUser):
     
     def __str__(self):
         return self.id
+
+    def serialize(self):
+        return {
+            "id": self.id
+        }

@@ -3,18 +3,24 @@ from django import forms
 from django.forms import ModelForm
 from django.utils.translation import gettext_lazy as _
 from model_utils import Choices
+from django.forms import ModelForm, inlineformset_factory, CharField, ChoiceField, Select
 from recipesite.models.ingredients import Ingredients
+
 
 
 class IngredientsForm(ModelForm):
     """This is a docstring which describes the module"""
+    name = CharField(
+    )
     
     class Meta:
         """This is a docstring which describes the module"""
         model = Ingredients
         fields = [
             'name',
-            'description'
+            'description',
+            'quantitywhole',
+            'quantityfraction'
         ]
         
     def __str__(self):
@@ -23,7 +29,6 @@ class IngredientsForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(IngredientsForm, self).__init__(*args, **kwargs)
         UNITSTATUS = Choices(
-            ('unit', ('Unit')),
             ('cup', ('Cup')),
             ('tablespoon', ('Tablespoon')),
             ('teaspoon', ('Teaspoon')),
@@ -36,14 +41,27 @@ class IngredientsForm(ModelForm):
             ('whole', ('Whole')),
         )
         QUANTS = Choices(
-            ('quantity', _('Quantity')),
             ('1/4', _('1/4')),
             ('1/3', _('1/3')),
             ('1/2', _('1/2')),
             ('2/3', _('2/3')),
             ('3/4', _('3/4')),
         )
-        self.fields['unitId'] = forms.ChoiceField(choices=UNITSTATUS)
-        self.fields['quantityfraction'] = forms.ChoiceField(choices=QUANTS)
+        WHOLE = Choices(
+            ('1', _('1')),
+            ('2', _('2')),
+            ('3', _('3')),
+            ('4', _('4')),
+            ('5', _('5')),
+            ('6', _('6')),
+            ('7', _('7')),
+            ('8', _('8')),
+            ('9', _('9')),
+            ('10', _('10')),
+            ('11', _('11')),
+            ('12', _('12')),
+        )
+        self.fields['unitId'] = ChoiceField(choices=UNITSTATUS)
+        # self.fields['quantityfraction'] = ChoiceField(choices=QUANTS)
+        # self.fields['quantitywhole'] = ChoiceField(choices=WHOLE)
 
-        

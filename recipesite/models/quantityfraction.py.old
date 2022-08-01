@@ -10,6 +10,7 @@ from django.db.models import (
 class QuantityFraction(Model):
 
     quantFraction = CharField(
+        primary_key = True,
         max_length = 8
     )
     

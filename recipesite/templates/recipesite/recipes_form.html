@@ -1,37 +1,36 @@
 {% extends "recipesite/layout.html" %}
 
 
+
+{% comment %} <form method="post" class="my-class">
+    {{ my_formset|crispy }}
+</form> {% endcomment %}
 {% block body %}
+{% load crispy_forms_tags %}
 <form action="" method="post">
-    {% csrf_token %}
-    <fieldset>
-            {{ form.non_field_errors }}
-            {% for field in form %}
-            <div class="row">
-                <div class="col-md-3">{{ field.label }}</div>
-                <div class="col-md-9">{{ field }}</div>
-            </div>
-            {% endfor %}
-    </fieldset>
-    <fieldset>
-            <legend>Assignment Questions</legend>
+        {% csrf_token %}
+        <fieldset>
+                {{ form|crispy }}
+        </fieldset>
+        <fieldset>
+            <legend>Ingredients</legend>
             {{ formset.management_form }}
             {{ formset.non_form_errors }}
-                            {% for form in formset %}
-                    <div class="inline {{ formset.prefix }}">
-                    {% for field in form.visible_fields %}
-                            <div class="row">
-                                    <div class="col-md-12">{{ field }}</div>
-                                    
-                            </div>
-                    {% endfor %}
-                    </div>
-            {% endfor %}
-    </fieldset>
-    <div class="row">
-            <div class="col-md-1">
-                    <input type="submit" class="btn btn-groppus-primary bordered" value="Create Recipe" />
-            </div>
-    </div>
+                {% for form in formset %}
+                        <div class="inline {{ formset.prefix }}">
+                        {% for field in form.visible_fields %}
+                                <div class="row">
+                                        <div class="col-md-3">{{ field.label }}</div>
+                                        <div class="col-md-9">{{ field }}</div>    
+                                </div>
+                        {% endfor %}
+                        </div>
+                {% endfor %}
+        </fieldset>
+        <div class="row">
+                <div class="col-md-1">
+                        <input type="submit" class="btn btn-groppus-primary bordered" value="Create Recipe" />
+                </div>
+        </div>
 </form>
 {% endblock %}
