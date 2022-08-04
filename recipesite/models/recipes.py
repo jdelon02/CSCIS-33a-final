@@ -1,8 +1,10 @@
 """Data models."""
 from django.db import models
 from django.urls import reverse
-# from .ingredientlists import IngredientLists
-# from .ingredients import Ingredients
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.utils.translation import gettext_lazy as _
+from model_utils import Choices
+from djangoformsetjs.utils import formset_media_js
 from django.db.models import (
     Model,
     CASCADE,
@@ -10,63 +12,81 @@ from django.db.models import (
     TextField,
     ManyToManyField,
     CharField,
-    DateTimeField
+    DateTimeField,
+    IntegerField,
+    ImageField
 )
-from . import User, ServingSize, PrepCookMin, PrepCookHour, Difficulty, Ingredients
+from . import User, Ingredients
 
 # TODO: Description Field to model, recipe.
 class Recipes(Model):
     
-    """Data model for user accounts."""
+    class Media(object):
+        js = formset_media_js + (
+            # Other form media here
+        )
+    
+    SERVING = Choices(
+        (None, 'Your String For Display'),
+        ('2', _('2')),
+        ('4', _('4')),
+        ('6', _('6')),
+        ('8', _('8')),
+        ('8+', _('More than 8')),
+    )
+    DIFFS = Choices(
+        ('easy', _('Easy')),
+        ('medium', _('Medium')),
+        ('hard', _('Hard')),
+    )
+    MINSTATUS = Choices(
+        ('00', _('00')),
+        ('15', _('15')),
+        ('30', _('30')),
+        ('45', _('45')),
+    )
+
     name = CharField(
         max_length = 80
     )
     description = CharField(
         max_length = 240
     )
-    servingQuantity = ForeignKey(
-        ServingSize, 
-        on_delete=CASCADE,
-        related_name='servingQuantity_ServingSize',
+    servingQuantity = CharField(
+        max_length = 15,
+        choices=SERVING,
+        blank=True,
+        null=True    
+    )
+    skillLevel = CharField(
+        max_length = 10,
+        choices=DIFFS,
+        blank=True,
+        null=True    
+    )
+    prepHour = IntegerField(
+        default=0,
+        choices=[(i, i) for i in range(1, 12)],
         blank=True,
         null=True
     )
-    skillLevel = ForeignKey(
-        Difficulty, 
-        on_delete=CASCADE,
-        related_name='skillLevel_Difficulty',
+    prepMin = CharField(
+        max_length=7,
+        choices=MINSTATUS,
+        blank=True,
+        null=True    
+    )
+    cookHour = IntegerField(
+        default=0,
+        choices=[(i, i) for i in range(1, 12)],
         blank=True,
         null=True
     )
-    # TODO: Combine these into 1 and crate another inline_formset
-    prepmin = ForeignKey(
-        PrepCookMin, 
-        on_delete=CASCADE,
-        related_name='prepmin_PrepCookMin',
+    cookMin = CharField(
+        max_length=7,
+        choices=MINSTATUS,
         blank=True,
-        null=True
-    )
-    prephour = ForeignKey(
-        PrepCookHour, 
-        on_delete=CASCADE,
-        related_name='prephour_PrepCookHour',
-        blank=True,
-        null=True
-    )
-    # TODO: Combine these into 1 and crate another inline_formset
-    cookmin = ForeignKey(
-        PrepCookMin, 
-        on_delete=CASCADE,
-        related_name='cookmin_PrepCookMin',
-        blank=True,
-        null=True
-    )
-    cookhour = ForeignKey(
-        PrepCookHour, 
-        on_delete=CASCADE,
-        related_name='cookhour_PrepCookHour',
-        blank=True,
-        null=True
+        null=True    
     )
     author = ForeignKey(
         User, 
@@ -84,6 +104,10 @@ class Recipes(Model):
         blank=True,
         related_name='likes'
     )
+    recipe_img = ImageField(
+        default='post.jpeg',
+        upload_to='images/'
+        )
 
     @property
     def total_likes(self):
@@ -102,6 +126,7 @@ class Recipes(Model):
         
     def __str__(self):
         return self.name
+        # return str(self.id)
     
     def get_absolute_url(self):
-        return reverse('recipe-detail', kwargs={'pk': self.pk})        
+        return reverse('recipedetail', kwargs={'pk': self.pk})        

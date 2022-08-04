@@ -2,9 +2,12 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from model_utils import Choices
-from django.forms import ModelForm, inlineformset_factory, ChoiceField, Select
+from django.shortcuts import render
+from django.urls import reverse_lazy
+from django.forms import CharField, ModelForm, inlineformset_factory, ChoiceField, Select, Textarea
 from recipesite.forms.ingredientsform import IngredientsForm
-from recipesite.models import Recipes, Ingredients
+from recipesite.forms.stepsform import StepForm
+from recipesite.models import Recipes, Ingredients, Steps
 from easy_select2 import select2_modelform, Select2
 
 
@@ -17,13 +20,21 @@ class RecipesForm(ModelForm):
         ('2/3', _('2/3')),
         ('3/4', _('3/4')),
     )
+    
     class Meta:
         """This is a docstring which describes the module"""
         model = Recipes
         fields = [
             'name',
             'description',
-            'likes'
+            'prepHour',
+            'prepMin',
+            'cookHour',
+            'cookMin',
+            'skillLevel',
+            'servingQuantity',
+            'recipe_img'
+            
         ]
     
     def __str__(self):
@@ -48,13 +59,13 @@ class RecipesForm(ModelForm):
         super(RecipesForm, self).__init__(*args, **kwargs)
         
         DIFFS = Choices(
-            ('default', _('Difficulty')),
+            (None, 'Skill Level'),
             ('easy', _('Easy')),
             ('medium', _('Medium')),
             ('hard', _('Hard')),
         )
         SERVING = Choices(
-            ('serving_size', _('Serving Size')),
+            (None, 'Servings / Quantity'),
             ('2', _('2')),
             ('4', _('4')),
             ('6', _('6')),
@@ -62,8 +73,8 @@ class RecipesForm(ModelForm):
             ('8+', _('More than 8')),
         )
         HOURSTATUS = Choices(
-            ('hrs', _('Hours')),
-            ('1', _('1')),
+            (None, 'Hours'),
+            ('1', _('1')),           
             ('2', _('2')),
             ('3', _('3')),
             ('4', _('4')),
@@ -77,49 +88,77 @@ class RecipesForm(ModelForm):
             ('12', _('12')),
         )
         MINSTATUS = Choices(
-            ('mins', _('Minutes')),
+            (None, 'Minutes'),
             ('00', _('00')),
             ('15', _('15')),
             ('30', _('30')),
             ('45', _('45')),
         )
-        self.fields['skillLevel'] = forms.ChoiceField(
-                                widget=Select2(),
+        self.fields['skillLevel'] = ChoiceField(
                                 choices=DIFFS, 
-                                label="Skill Level"
+                                label="Skill Level",
+                                required=False,
+                                initial="Difficulty"
+                                
                         )
-        self.fields['servingQuantity'] = forms.ChoiceField(
+        self.fields['servingQuantity'] = ChoiceField(
                                 choices=SERVING, 
-                                label="Servings / Quantity"
+                                label="Servings / Quantity",
+                                required=False
                         )
-        self.fields['prephour'] = forms.ChoiceField(
+        self.fields['prepHour'] = ChoiceField(
                                 choices=HOURSTATUS, 
-                                label="Hours"
+                                label="Hours",
+                                required=False
                         )
-        self.fields['prepmin'] = forms.ChoiceField(
+        self.fields['prepMin'] = ChoiceField(
                                 choices=MINSTATUS, 
-                                label="Minutes"
+                                label="Minutes",
+                                required=False
                         )
-        self.fields['cookhour'] = forms.ChoiceField(
+        self.fields['cookHour'] = ChoiceField(
                                 choices=HOURSTATUS, 
-                                label="Hours"
+                                label="Hours",
+                                required=False
                         )
-        self.fields['cookmin'] = forms.ChoiceField(
+        self.fields['cookMin'] = ChoiceField(
                                 choices=MINSTATUS, 
-                                label="Minutes"
+                                label="Minutes",
+                                required=False
                         )
-
+        self.fields['description'] = CharField(
+                                widget=Textarea
+                        )
+        
 IngredientFormSet = inlineformset_factory(
     Recipes, 
     Ingredients,
-    # fields=(
-    #     'quantitywhole',
-    #     'quantityfraction',
-    #     'unitId',
-    #     'name',
-    #     'description'
-    # ),
     form=IngredientsForm,
     extra=1,
     can_delete=True
 )
+
+def ingredientset_view(request):
+    formset = IngredientFormSet(request.POST or None)
+
+    if formset.is_valid():
+        pass
+
+    # return render(request, 'formset.html', {'formset': formset})
+    return render(request, reverse_lazy('recipeupdate'), {'formset': formset})
+
+StepFormSet = inlineformset_factory(
+    Recipes, 
+    Steps,
+    form=StepForm,
+    extra=1,
+    can_delete=True
+)
+
+def stepformset_view(request):
+    formset = StepFormSet(request.POST or None)
+
+    if formset.is_valid():
+        pass
+
+    return render(request, reverse_lazy('recipeupdate'), {'formset': formset})

@@ -11,23 +11,22 @@ from django.db.models import (
     TextField,
     CharField
 )
-from . import Units
+ 
  
 class Ingredients(Model):
     UNITSTATUS = Choices(
-            ('cup', ('Cup')),
-            ('tablespoon', ('Tablespoon')),
-            ('teaspoon', ('Teaspoon')),
-            ('pint', ('Pint')),
-            ('quart', ('Quart')),
-            ('ounce', ('Ounce')),
-            ('dozen', ('Dozen')),
-            ('can', ('Can')),
-            ('bunch', ('Bunch')),
-            ('whole', ('Whole')),
-        )
+        ('cup', ('Cup')),
+        ('tablespoon', ('Tablespoon')),
+        ('teaspoon', ('Teaspoon')),
+        ('pint', ('Pint')),
+        ('quart', ('Quart')),
+        ('ounce', ('Ounce')),
+        ('dozen', ('Dozen')),
+        ('can', ('Can')),
+        ('bunch', ('Bunch')),
+        ('whole', ('Whole')),
+    )
     QUANTS = Choices(
-        ('quantity', _('Quantity')),
         ('1/4', _('1/4')),
         ('1/3', _('1/3')),
         ('1/2', _('1/2')),
@@ -42,21 +41,23 @@ class Ingredients(Model):
         blank=True,
         null=True
     )
-    name = CharField(
-        blank=False,
-        null=True,
-        max_length=75
+    quantitywhole = CharField(
+        max_length=2,
+        blank=True,
+        null=True
+    )
+    quantityfraction = CharField(
+        max_length = 8,
+        choices=QUANTS,
+        blank=True,
+        null=True        
     )
     unitId = CharField(
         max_length = 10,
         choices=UNITSTATUS        
     )
-    quantitywhole = CharField(
-        max_length=2
-    )
-    quantityfraction = CharField(
-        max_length = 8,
-        choices=QUANTS        
+    name = CharField(
+        max_length=75
     )
     description = CharField(
         max_length=100,
@@ -70,3 +71,4 @@ class Ingredients(Model):
 
     def __str__(self):
         return self.name
+        # return str(self.name)

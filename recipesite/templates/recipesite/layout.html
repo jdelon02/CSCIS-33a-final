@@ -6,36 +6,51 @@
         <meta charset="utf-8"/>
         <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
         <title>{% block title %}Social Network{% endblock %}</title>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" />
+        {# Load the tag library #}
+        {% load bootstrap5 %}
+        {# Load CSS and JavaScript #}
+        {% bootstrap_css %}
+        {% bootstrap_javascript %}
+        {# Display django.contrib.messages as Bootstrap alerts #}
+        {% bootstrap_messages %}
         <link href="{% static 'recipesite/styles.css' %}" rel="stylesheet">
         <meta name="description" content="Structure your Flask apps in a scalable and intelligent way using Blueprints."/>
         <meta name="HandheldFriendly" content="True"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
         <meta name="description" content="" />
+        <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+        <script src="{% static 'static_jquery/js/jquery.js' %}"></script>
+        <script src="{% static 'recipesite/js/jquery.formset.js' %}"></script> 
     </head>
     <body>
 
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="#">Network</a>
-          
-            <div>
-              <ul class="navbar-nav mr-auto">
+            <div class="container-fluid">
+                <a class="name navbar-brand" href="{% url 'index' %}">Recipe Keeper</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                  <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'index' %}">Home</a>
+                    </li>
                 {% comment %} {% if user.is_authenticated %}
                     <li class="nav-item">
                         
                         <a class="nav-link" href="{% url 'user_detail' pk=user.id %}"><strong>{{ user.username }}</strong></a>
                     </li>
                 {% endif %} {% endcomment %}
-                <li class="nav-item">
-                  <a class="nav-link" href="{% url 'index' %}">All Recipes</a>
-                </li>
                 {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'recipe-add' %}">New Recipe</a>
+                        <a class="nav-link" href="{% url 'user_detail' pk=user.id %}">My Recipes</a>
                     </li>
-                    {% comment %} <li class="nav-item">
-                        <a class="nav-link" href="{% url 'bookmarks' %}">Bookmarks</a>
-                    </li> {% endcomment %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'bookmarks' %}">My Bookmarks</a>
+                    </li>                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'recipeadd' %}">New Recipe</a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
                     </li>
@@ -47,9 +62,17 @@
                         <a class="nav-link" href="{% url 'register' %}">Register</a>
                     </li>
                 {% endif %}
-              </ul>
-            </div>
-          </nav>
+            </ul>
+            {% if user.is_authenticated %}
+                <div class="welcome nav-link">Welcome back, <a href="{% url 'user_detail' pk=user.id %}">{{ user.username }}</a>!</div>
+            {% endif %}
+            <form class="d-flex" method="GET" action="{% url 'recipesearch' %}" id="searchbar">
+                <input class="form-control mr-sm-2" type="search" name="search">
+                <button class="btn btn btn-outline-info my-2 my-sm-0" type="submit"> Search </button>
+            </form>
+          </div>
+        </div>
+      </nav>
         
         <div class="body">
             {% block body %}
@@ -57,23 +80,6 @@
         </div>
 
         {% block script %}
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js" crossorigin="anonymous" async></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script src="{% static "django-dynamic-formset/src/jquery.formset.js" %}"></script>
-        <script type="text/javascript">
-            $(function() {
-                $(".inline.{{ formset.prefix }}").formset({
-                    prefix: "{{ formset.prefix }}", // The form prefix for your django formset
-                    addCssClass: "btn btn-block btn-primary bordered inline-form-add", // CSS class applied to the add link
-                    deleteCssClass: "btn btn-block btn-primary bordered", // CSS class applied to the delete link
-                    addText: 'Add another question', // Text for the add link
-                    deleteText: 'Remove question above', // Text for the delete link
-                    formCssClass: 'inline-form' // CSS class applied to each form in a formset
-                })
-            });
-        </script>
         <script src="{% static 'recipesite/index.js' %}" defer></script>
         {% endblock %}
     </body>

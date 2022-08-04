@@ -114,7 +114,7 @@ class UserDetailView(DetailView):
     """
     model = User
     context_object_name = 'user_detail'
-    template_name = 'recipes/user.html'
+    template_name = 'recipesite/user.html'
     # paginate_by = 10
     
     def get_context_data(self, *args, **kwargs):
@@ -123,7 +123,7 @@ class UserDetailView(DetailView):
         current_id = self.kwargs['pk']
         current_user = self.request.user.id
         context['currentUser'] = self.request.user.id
-        allposts = Recipes.objects.all().filter(user_id=current_id).distinct().order_by('-id')
+        allposts = Recipes.objects.all().filter(author=current_id).distinct().order_by('-id')
         context["allrecipes"] = allposts
         
         context['recipe_user'] = current_id

@@ -20,6 +20,21 @@ from recipesite.models import *
 from recipesite.forms import ingredientsform, recipesform
 # from recipesite.forms.recipesform import IngredientFormSet, RecipesForm
 
+class Index(ListView):
+    """This is a docstring which describes the module"""
+    model = Ingredients
+    context_object_name = 'ingredients_listview'
+    template_name = 'recipesite/ingredients_list.html'
+    
+    def get_context_data(self, *args, **kwargs):
+        context = super(Index,
+                        self).get_context_data(*args, **kwargs)
+        current_user = self.request.user.id
+        context['currentUser'] = current_user
+        
+        return context
+    
+
 class IngredientsCreateView(CreateView):
     model = Ingredients
     form_class = ingredientsform.IngredientsForm

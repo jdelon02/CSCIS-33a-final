@@ -1,50 +1,30 @@
-{% extends "network/layout.html" %}
-
+{% extends "recipesite/layout.html" %}
+{# Load the tag library #}
+{% load static %}
+{% load bootstrap5 %}
 {% block body %}
-    <div id="followerCount">Following: {{ followerCount }}</div>
-    <div id="followedCount">Followers: {{ followedCount }}</div>
-    {% if user.is_authenticated and user.id != recipe_user %}
-        {% if following == "Unfollow" %}
-            <button id="{{ user.id }}" data-id="{{ user.id }}" class="btn btn-primary card-link" onClick=followMe(this);>Unollow</button>
-        {% else %}
-            <button id="{{ user.id }}" data-id="{{ user.id }}" class="btn btn-primary card-link" onClick=followMe(this);>Follow</button>
-        {% endif %}
-    {% endif %}
-    {% for recipe in allrecipes %}
-        <div class="card" style="width: 18rem;" id="card-{{ recipe.id }}">
-            <div class="card-body">
-                {% comment %} <h5 class="card-title">Card title</h5> {% endcomment %}
-                <h6 class="card-subtitle mb-2 text-muted"><a href="{% url 'user_detail' pk=recipe.user_id.pk %}">@{{ recipe.user_id }}</a> wrote:</h6>
-                <p class="card-text">{{ recipe.body }}</p>
-                <button id="{{ recipe.id }}" value="Likes: {{ recipe.total_likes }}" data-id="{{ recipe.id }}" data-currentuser="{{ user.username }}" class="btn btn-primary card-link" onClick=likebutton(this);>{{ recipe.total_likes }}</button>
-                <a href="#" class="card-link">{{ recipe.timestamp }}</a>
-                {% if user.username|stringformat:"s" == recipe.user_id|stringformat:"s" %}
-                    <button id="edit-{{ recipe.id }}" data-id="{{ recipe.id }}" data-currentuser="{{ user.username }}" class="btn btn-primary card-link-edit" onClick=editMe(this);>Edit</button>
-                    <form method="recipe" id="form-{{ recipe.id }}" class="form-card" onsubmit="return update_recipe({{ recipe.id }})"></form>
-                {% endif %}
-            </div>
+{% load crispy_forms_tags %}
+<div class="container">
+    <form role="form" action="" method="post">
+        <div class="row gx-5">
+        {% csrf_token %}
+            <fieldset class="m-5">                
+                <div class="container">
+                    <div class="row gx-5" data-masonry='{"percentPosition": true }'>
+                    {% for recipe in allrecipes %}
+                        {% include "recipesite/snippets/bootcard.html" %}
+                    {% empty %}
+                        <p>There are no Post to view at this time.</p>
+                    {% endfor %}
+                    </div>
+                </div>
+            </fieldset>
+            {% bootstrap_pagination page_obj %}
         </div>
-    {% empty %}
-        <p>There are no recipe to view at this time.</p>
-    {% endfor %}
-
-    {% if paginator > 1 %}
-        <div class="pagination">
-            <span class="step-links">
-                {% if page_obj.has_previous %}
-                    <a href="?page=1">&laquo; first</a>
-                    <a href="?page={{ page_obj.previous_page_number }}">previous</a>
-                {% endif %}
-
-                <span class="current">
-                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-                </span>
-
-                {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}">next</a>
-                    <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
-                {% endif %}
-            </span>
-        </div>
-    {% endif %}
+    </form>
+</div>                    
+{% endblock %}
+{% block script %}
+{% include "recipesite/snippets/masonry.html" %}
+<script src="{% static 'recipesite/index.js' %}" defer></script>
 {% endblock %}
