@@ -127,7 +127,11 @@ class RecipesForm(ModelForm):
                                 required=False
                         )
         self.fields['description'] = CharField(
-                                widget=Textarea
+                                widget=Textarea,
+                                label="Description*"
+                        )
+        self.fields['name'] = CharField(
+                                label="Name*"
                         )
         
 IngredientFormSet = inlineformset_factory(

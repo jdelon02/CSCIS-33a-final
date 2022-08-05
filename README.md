@@ -1,11 +1,31 @@
 # CSCIS-33a-final
 
+
+
+## The Basics
+
 This project was essentially to take the [Recipe project](https://github.com/jdelon02/cs50Final) I did in Flask for CS50 and Django-fy it.  I also wanted to really try and get a better understanding of the MVC model while leveraging Django's built in Class based approach.  There were several features that the Flask version had:
 1. Register/Login/Logout functionality - For Django project, this was baked in.
 2. The ability to view a masonry style grid of Recipes.  
-3. The ability to "flag" recipes and "save" them for later viewing.
+3. The ability to "flag" recipes and for later viewing.
 4. A detail page of a recipe, giving more info then the Masonry style display.
 5. The ability to search for recipes by title.
+
+The repo is avaiable at [github](https://github.com/jdelon02/CSCIS-33a-final)
+The DB can be deleted, and rebuilt using the following commands:
+`find . -path "*/migrations/*.py" -not -name "__init__.py" -delete`
+`find . -path "*/migrations/*.pyc"  -delete`
+`python manage.py makemigrations recipesite`
+`python manage.py migrate`
+
+This would allow for registering new users, etc...
+
+There are test users on the site already:
+User/Pass:
+test1/test
+test2/test
+
+I did not end up utilizing the django admin.  99% of the functionality for this is for an end user, so it just wasn't needed.
 
 ## My Approach:
 
@@ -23,6 +43,7 @@ The other area that I really had a hard time with was wanting to allow dynamic i
 **Steps** - Really just a textarea field with an fk to a recipe.  Step 1, chop all ingredients, Step 2, turn on Oven to 350.  etc...
 **Recipes** - This model was the real workhorse of the show.  It has fields for the "per-recipe" specifics.  These are textfields, choicefields, fks, m2m, and a filefield.  
 **Userfollowing** - Deprecated.
+**Bookmarks** - Deprecated
 
 ### The Forms:
 **User Form** - Nothing special, just returns the user.
@@ -31,6 +52,14 @@ The other area that I really had a hard time with was wanting to allow dynamic i
 **Recipes Form** - This was the form that gets the most use.  It does a lot of what the ingredients form does, in that it creates default values, establishes field/widget types, and also has two inline_formsetfactories that allow for adding the ingredients and steps on the same frontend form.
 I had considered making the "edit" page a single page operation using js, but with the nested formsets, I decided that just wouldn't make sense.
 
+### Templates
+All of the templates use bootstrap5.  I also leveraged several django packages, to either write less styling, or to leverage bootstrap abilities.  I used masonry grid with boostrap cards to create a pinterest style feel throughout.
+
+### Static
+I manage to build the site using only 2 or 3 css changes.  Part of that was due to just actually liking most of the default bootstrap styling.  But, it was also possible because of the packages I leveraged that allowed me to not need to overwrite as much as I was expecting.
+
+There is a "media" directory, which has 2 default images in it.  I am .gitignoring the images folder within, which is where user uploaded images would live.
+
 ### The Views:
 
 ***User View***
@@ -38,14 +67,6 @@ This was the only form that I did not fully switch over to a "class-based" appro
 
 ***Ingredients View***
 Originally, during dev, I was using this form as a way to test if things were getting created correctly.  I can't think of any use case for needing this form now, so I have removed the URL pattern to access.
-
-***Templates***
-All of the templates use bootstrap5.  I also leveraged several django packages, to either write less styling, or to leverage bootstrap abilities.  I used masonry grid with boostrap cards to create a pinterest style feel throughout.
-
-***Static***
-I manage to build the site using only 2 or 3 css changes.  Part of that was due to just actually liking most of the default bootstrap styling.  But, it was also possible because of the packages I leveraged that allowed me to not need to overwrite as much as I was expecting.
-
-There is a "media" directory, which has 2 default images in it.  I am .gitignoring the images folder within, which is where user uploaded images would live.
 
 ***Recipe View***
 This is the view that does most of the work.  There is a default index(listview) class, which renders the homepage, a bookmark(listview), the creation class, the update class, etc...  I was able to leverage the slight differences in classes to limit the number of templates I needed.  So, for example, the index page and the bookmark page both use the same template, but the queryset returns different results to each.  
@@ -56,6 +77,3 @@ I also wanted to incorporate some of the functionality from the "Network" homewo
 I did not get the ingredient and step formset working as seamlessly as I would have liked.
 
 If I had to do this again, I would try and do a full DB diagram first.  I think the functionality behind this simple program could be expanded to include scraping Recipes Sites, creating Grocery Lists, etc... but I would want to redo some of the structure to better accomodate that.
-
-
-

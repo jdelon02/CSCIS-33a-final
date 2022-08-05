@@ -13,7 +13,7 @@
                         <div class="container">
                                 <legend>Recipe Information</legend>
                                 <div class="row gx-4 mt-4">
-                                        <div class="col">{% bootstrap_field form.name layout="inline" %}</div>
+                                        <div class="col">{% bootstrap_field form.name layout="inline" required_css_class="required" %}</div>
                                 </div>
                                         <div class="col">{% bootstrap_field form.recipe_img layout="inline" %}</div>
                                 </div>
@@ -37,7 +37,7 @@
                                                 </div>
                                         </div>
                                 </div>
-                                <div class="row gx-4 mt-4"><div class="col">{% bootstrap_field form.description layout="inline" %}</div></div>
+                                <div class="row gx-4 mt-4"><div class="col">{% bootstrap_field form.description layout="inline" required_css_class="required" %}</div></div>
                                 <div class="row justify-content-around mt-4 gx-4">
                                         <div class='col-4 preptime mt-4'>                                        
                                                 <div class="container">
@@ -63,13 +63,14 @@
                         {{ ingredientformset.non_form_errors }}
                         <div class="container">
                                 <legend>Ingredients</legend>
+                                <caption><i>Before Saving, be sure to remove any unused rows, otherwise save will fail.</i></caption>
                                 <div class="row mt-4">
                                         <div class='col ingredientsingle'>                                                
                                                 <div class="container">
                                                         <div class="row align-items-center mt-1">
                                                                 <div class="col-md-3"><center>Quantity</center></div>
                                                                 <div class="col-md-2">Unit</div>
-                                                                <div class="col-md-3">Ingredient</div>
+                                                                <div class="col-md-3">Ingredient*</div>
                                                                 <div class="col-md-4">Instructions</div>
                                                         </div>
                                                         {% for ingr in ingredientformset %}
@@ -80,7 +81,7 @@
                                                                 <div class="col-md-1">{% bootstrap_field ingr.quantitywhole layout="inline" size="sm" %}</div>
                                                                 <div class="col-md-2">{% bootstrap_field ingr.quantityfraction layout="inline" size="sm" %}</div>
                                                                 <div class="col-md-2">{% bootstrap_field ingr.unitId layout="inline" size="sm" %}</div>
-                                                                <div class="col-md-2">{% bootstrap_field ingr.name layout="inline" %}</div>
+                                                                <div class="col-md-2">{% bootstrap_field ingr.name layout="inline" required_css_class="required"  %}</div>
                                                                 <div class="col-md-3">{% bootstrap_field ingr.description layout="inline" %}</div>
                                                         </div>
                                                         
@@ -96,6 +97,7 @@
                         {{ stepformset.non_form_errors }}
                         <div class="container">
                                 <legend>Steps</legend>
+                                <caption><i>Before Saving, be sure to remove any unused rows, otherwise save will fail.</i></caption>
                                 <div class="row mt-4">
                                         <div class='col stepformsingle'>                                                
                                                 <div class="container">
@@ -111,8 +113,9 @@
                                 </div>
                         </div>      
                 </fieldset>
-        
+                        <b>* = Required Field.</b>
                 <div class="row">
+                        
                         <div class="col-md-1">
                                 <input type="submit" id="triggerbutton" class="btn btn-primary card-link" value="Save Recipe" />
                         </div>

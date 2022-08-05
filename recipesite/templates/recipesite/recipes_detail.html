@@ -49,7 +49,7 @@
                                                                 <div class="col-sm">
                                                                         {% if object.prepHour|stringformat:"s" != 'None' and object.prepMin|stringformat:"s" != 'None' %}
                                                                                 <caption>Prep Time:</caption>
-                                                                                {% if object.prepHour|stringformat:"s" != 'None' %}h :{% endif %}
+                                                                                {% if object.prepHour|stringformat:"s" != 'None' %}{{ object.prepHour }}h :{% endif %}
                                                                                 {% if object.prepMin|stringformat:"s" != 'None' %}{{ object.prepMin }}m{% endif %}
                                                                         {% endif %}
                                                                 </div>                                                                
@@ -62,7 +62,7 @@
                                                                 <div class="col-sm-12">
                                                                         {% if object.cookHour|stringformat:"s" != 'None' and object.cookMin|stringformat:"s" != 'None' %}
                                                                                 <caption>Cook Time:</caption> 
-                                                                                {% if object.cookHour|stringformat:"s" != 'None' %}h :{% endif %}
+                                                                                {% if object.cookHour|stringformat:"s" != 'None' %}{{ object.cookHour }}h :{% endif %}
                                                                                 {% if object.cookMin|stringformat:"s" != 'None' %}{{ object.cookMin }}m{% endif %}
                                                                         {% endif %}
                                                                 </div>

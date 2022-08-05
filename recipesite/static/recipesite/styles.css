@@ -17,3 +17,11 @@ fieldset a {
 .btn-outline-primary.disabled, .btn-outline-primary:disabled {
     border-width: 0px;
 }
+
+.required label {
+    color: red;
+}
+
+.required label::after {
+    content: "*";
+}
